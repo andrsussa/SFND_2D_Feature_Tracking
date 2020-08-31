@@ -186,6 +186,9 @@ void detKeypointsModern(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img,
     }
     else if (detectorType.compare("BRISK") == 0)
     {
+        int brisk_threshold = 50;
+        detector = cv::BRISK::create(brisk_threshold);
+        detector->detect(img, keypoints);
     }
     else if (detectorType.compare("ORB") == 0)
     {
