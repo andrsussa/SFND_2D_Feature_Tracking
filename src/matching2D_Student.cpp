@@ -197,6 +197,8 @@ void detKeypointsModern(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img,
     }
     else if (detectorType.compare("AKAZE") == 0)
     {
+        detector = cv::AKAZE::create();
+        detector->detect(img, keypoints);
     }
     else
     {
