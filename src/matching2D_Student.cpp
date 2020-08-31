@@ -183,10 +183,6 @@ void detKeypointsModern(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img,
         bool fast_nms = true;
         detector = cv::FastFeatureDetector::create(fast_threshold, fast_nms);
         detector->detect(img, keypoints);
-        t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
-        cout << "FAST detection with n=" << keypoints.size() << 
-            " keypoints in " << 1000 * t / 1.0 << " ms" << endl;
-        windowName = "FAST Detector Results";
     }
     else if (detectorType.compare("BRISK") == 0)
     {
@@ -200,6 +196,11 @@ void detKeypointsModern(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img,
     else
     {
     }
+
+    t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
+    cout << detectorType << " detection with n=" << keypoints.size() << 
+        " keypoints in " << 1000 * t / 1.0 << " ms" << endl;
+    windowName = detectorType + " Detector Results";
 
     // visualize results
     if (bVis)
