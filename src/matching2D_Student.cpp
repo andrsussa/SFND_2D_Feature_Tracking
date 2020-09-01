@@ -182,23 +182,19 @@ void detKeypointsModern(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img,
         int fast_threshold = 40;
         bool fast_nms = true;
         detector = cv::FastFeatureDetector::create(fast_threshold, fast_nms);
-        detector->detect(img, keypoints);
     }
     else if (detectorType.compare("BRISK") == 0)
     {
         int brisk_threshold = 50;
         detector = cv::BRISK::create(brisk_threshold);
-        detector->detect(img, keypoints);
     }
     else if (detectorType.compare("ORB") == 0)
     {
         detector = cv::ORB::create();
-        detector->detect(img, keypoints);
     }
     else if (detectorType.compare("AKAZE") == 0)
     {
         detector = cv::AKAZE::create();
-        detector->detect(img, keypoints);
     }
     else if (detectorType.compare("SIFT") == 0)
     {
@@ -206,7 +202,10 @@ void detKeypointsModern(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img,
     }
     else
     {
+        cout << "DETECTOR NOT RECOGNIZED!" << endl;
     }
+
+    if (detector != nullptr) {detector->detect(img, keypoints);}
 
     t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
     cout << detectorType << " detection with n=" << keypoints.size() << 
