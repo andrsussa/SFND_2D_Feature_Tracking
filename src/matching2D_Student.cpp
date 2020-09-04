@@ -174,9 +174,9 @@ void detKeypointsHarris(std::vector<cv::KeyPoint> &keypoints,
 void detKeypointsModern(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, 
         std::string detectorType, bool bVis)
 {
-    double t = (double)cv::getTickCount();
     cv::Ptr<cv::Feature2D> detector;
     string windowName;
+    double t = (double)cv::getTickCount();
     if (detectorType.compare("FAST") == 0)
     {
         int fast_threshold = 40;
