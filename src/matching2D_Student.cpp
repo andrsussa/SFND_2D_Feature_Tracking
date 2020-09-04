@@ -13,12 +13,20 @@ void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource, std::vector<cv::Key
 
     if (matcherType.compare("MAT_BF") == 0)
     {
-        int normType = cv::NORM_HAMMING;
+        int normType = descriptorType.compare("DES_BINARY") == 0 ? cv::NORM_HAMMING : cv::NORM_L2;
         matcher = cv::BFMatcher::create(normType, crossCheck);
     }
     else if (matcherType.compare("MAT_FLANN") == 0)
     {
-        // ...
+        if (descSource.type() != CV_32F)
+        {
+            descSource.convertTo(descSource, CV_32F);
+        }if (descRef.type() != CV_32F)
+        {
+            descRef.convertTo(descRef, CV_32F);
+        }
+
+        matcher = cv::FlannBasedMatcher::create();
     }
 
     // perform matching task
@@ -29,8 +37,16 @@ void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource, std::vector<cv::Key
     }
     else if (selectorType.compare("SEL_KNN") == 0)
     { // k nearest neighbors (k=2)
+        int k = 2;
+        vector<vector<cv::DMatch> > knnMatches;
+        matcher->knnMatch(descSource, descRef, knnMatches, k);
 
-        // ...
+        for (auto it = knnMatches.begin(); it != knnMatches.end(); ++it) {
+            float NNDR = (*it).at(0).distance / (*it).at(1).distance;
+            float NNDRth = 0.8;
+            if (NNDR < NNDRth)
+                matches.push_back((*it).at(0));;
+        }
     }
 }
 
