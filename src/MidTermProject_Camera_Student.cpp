@@ -42,6 +42,7 @@ int main(int argc, const char *argv[])
 
     /* MAIN LOOP OVER ALL IMAGES */
 
+    int n_comp = 0;
     for (size_t imgIndex = 0; imgIndex <= imgEndIndex - imgStartIndex; imgIndex++)
     {
         /* LOAD IMAGE INTO BUFFER */
@@ -75,6 +76,7 @@ int main(int argc, const char *argv[])
         // extract 2D keypoints from current image
         string detectorType = "SHITOMASI";
         vector<cv::KeyPoint> keypoints_all, keypoints; // create empty feature list for current image
+        double n_keypoints, n_matches, t_detector, t_descriptor;
 
         //// STUDENT ASSIGNMENT
         //// TASK MP.2 -> add the following keypoint detectors in file matching2D.cpp and enable string-based selection based on detectorType
@@ -82,15 +84,15 @@ int main(int argc, const char *argv[])
 
         if (detectorType.compare("SHITOMASI") == 0)
         {
-            detKeypointsShiTomasi(keypoints_all, imgGray, false);
+            t_detector = detKeypointsShiTomasi(keypoints_all, imgGray, false);
         }
         else if (detectorType.compare("HARRIS") == 0)
         {
-            detKeypointsHarris(keypoints_all, imgGray, false);
+            t_detector = detKeypointsHarris(keypoints_all, imgGray, false);
         }
         else
         {
-            detKeypointsModern(keypoints_all, imgGray, detectorType, false);
+            t_detector = detKeypointsModern(keypoints_all, imgGray, detectorType, false);
         }
         //// EOF STUDENT ASSIGNMENT
 
@@ -148,7 +150,7 @@ int main(int argc, const char *argv[])
 
         cv::Mat descriptors;
         string descriptorType = "BRISK"; // BRIEF, ORB, FREAK, AKAZE, SIFT
-        descKeypoints((dataBuffer.end() - 1)->keypoints, (dataBuffer.end() - 1)->cameraImg, descriptors, descriptorType);
+        t_descriptor = descKeypoints((dataBuffer.end() - 1)->keypoints, (dataBuffer.end() - 1)->cameraImg, descriptors, descriptorType);
         //// EOF STUDENT ASSIGNMENT
 
         // push descriptors for current frame to end of data buffer
@@ -183,6 +185,17 @@ int main(int argc, const char *argv[])
                              matches, descriptorType2, matcherType, selectorType);
 
             //// EOF STUDENT ASSIGNMENT
+            n_matches = matches.size();
+
+            // Write to CSV file
+            fstream fout;
+
+            n_comp++;
+            fout.open(detectorType + "-" + descriptorType + ".csv", ios::out | ios::app);
+            fout << n_comp << "," << n_keypoints << "," << neigh_dist_variance << "," <<
+                n_matches << "," << t_detector << "," << t_descriptor << endl;
+
+            fout.close();
 
             // store matches in current data frame
             (dataBuffer.end() - 1)->kptMatches = matches;

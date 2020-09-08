@@ -51,7 +51,7 @@ void matchDescriptors(std::vector<cv::KeyPoint> &kPtsSource, std::vector<cv::Key
 }
 
 // Use one of several types of state-of-art descriptors to uniquely identify keypoints
-void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descriptors, string descriptorType)
+double descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descriptors, string descriptorType)
 {
     // select appropriate descriptor
     cv::Ptr<cv::DescriptorExtractor> extractor;
@@ -95,10 +95,12 @@ void descKeypoints(vector<cv::KeyPoint> &keypoints, cv::Mat &img, cv::Mat &descr
 
     t = ((double)cv::getTickCount() - t) / cv::getTickFrequency();
     cout << descriptorType << " descriptor extraction in " << 1000 * t / 1.0 << " ms" << endl;
+
+    return 1000 * t / 1.0;
 }
 
 // Detect keypoints in image using the traditional Shi-Thomasi detector
-void detKeypointsShiTomasi(vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool bVis)
+double detKeypointsShiTomasi(vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool bVis)
 {
     // compute detector parameters based on image size
     int blockSize = 4;       //  size of an average block for computing a derivative covariation matrix over each pixel neighborhood
@@ -110,8 +112,8 @@ void detKeypointsShiTomasi(vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool b
     double k = 0.04;
 
     // Apply corner detection
-    double t = (double)cv::getTickCount();
     vector<cv::Point2f> corners;
+    double t = (double)cv::getTickCount();
     cv::goodFeaturesToTrack(img, corners, maxCorners, qualityLevel, minDistance, cv::Mat(), blockSize, false, k);
 
     // add corners to result vector
@@ -136,9 +138,11 @@ void detKeypointsShiTomasi(vector<cv::KeyPoint> &keypoints, cv::Mat &img, bool b
         imshow(windowName, visImage);
         cv::waitKey(0);
     }
+
+    return 1000 * t / 1.0;
 }
 
-void detKeypointsHarris(std::vector<cv::KeyPoint> &keypoints, 
+double detKeypointsHarris(std::vector<cv::KeyPoint> &keypoints, 
         cv::Mat &img, bool bVis)
 {
     int blockSize = 2;
@@ -204,10 +208,12 @@ void detKeypointsHarris(std::vector<cv::KeyPoint> &keypoints,
         imshow(windowName, visImage);
         cv::waitKey(0);
     }
+
+    return 1000 * t / 1.0;
 }
 
 
-void detKeypointsModern(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, 
+double detKeypointsModern(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img, 
         std::string detectorType, bool bVis)
 {
     cv::Ptr<cv::Feature2D> detector;
@@ -258,4 +264,6 @@ void detKeypointsModern(std::vector<cv::KeyPoint> &keypoints, cv::Mat &img,
         imshow(windowName, visImage);
         cv::waitKey(0);
     }
+
+    return 1000 * t / 1.0;
 }
