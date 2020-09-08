@@ -108,6 +108,17 @@ int main(int argc, const char *argv[])
                     keypoints.push_back(*it);
             }
         }
+        n_keypoints = keypoints.size();
+
+        double mean = std::accumulate(keypoints.begin(), keypoints.end(), 0.0, [](double sum, cv::KeyPoint b) {return sum + b.size;})/n_keypoints;
+        printf("NEIGHBORHOOD SIZE MEAN = %.4f\n", mean);
+        auto add_square = [mean](double sum, cv::KeyPoint i)
+        {
+            auto d = i.size - mean;
+            return sum + d*d;
+        };
+        double total = std::accumulate(keypoints.begin(), keypoints.end(), 0.0, add_square);
+        double neigh_dist_variance = total / n_keypoints;
 
         //// EOF STUDENT ASSIGNMENT
 
@@ -152,8 +163,16 @@ int main(int argc, const char *argv[])
 
             vector<cv::DMatch> matches;
             string matcherType = "MAT_BF";        // MAT_BF, MAT_FLANN
-            string descriptorType = "DES_BINARY"; // DES_BINARY, DES_HOG
-            string selectorType = "SEL_NN";       // SEL_NN, SEL_KNN
+            string descriptorType2; // DES_BINARY, DES_HOG
+            string selectorType = "SEL_KNN";       // SEL_NN, SEL_KNN
+            if (descriptorType.compare("SIFT") == 0)
+            {
+                descriptorType2 = "DES_HOG"; // DES_BINARY, DES_HOG
+            }
+            else
+            {
+                descriptorType2 = "DES_BINARY"; // DES_BINARY, DES_HOG
+            }
 
             //// STUDENT ASSIGNMENT
             //// TASK MP.5 -> add FLANN matching in file matching2D.cpp
@@ -161,7 +180,7 @@ int main(int argc, const char *argv[])
 
             matchDescriptors((dataBuffer.end() - 2)->keypoints, (dataBuffer.end() - 1)->keypoints,
                              (dataBuffer.end() - 2)->descriptors, (dataBuffer.end() - 1)->descriptors,
-                             matches, descriptorType, matcherType, selectorType);
+                             matches, descriptorType2, matcherType, selectorType);
 
             //// EOF STUDENT ASSIGNMENT
 
